@@ -80,6 +80,102 @@
             color: white;
             padding: 20px 0;
         }
+ /* 水平滾動容器的樣式 */
+.horizontal-scroll-row {
+  /* display: flex; */ /* Bootstrap 的 .row 已經是 display: flex */
+  /* flex-wrap: nowrap; */ /* Bootstrap 5 的 .flex-nowrap class */
+  /* overflow-x: auto; */ /* Bootstrap 5 的 .overflow-auto 或 .overflow-x-auto class */
+  /* padding-bottom: 1rem; */ /* Bootstrap 5 的 .pb-3 class */
+
+  /* 清除 row 預設的負 margin，避免滾動條被隱藏 */
+  margin-left: 0;
+  margin-right: 0;
+
+  /* 為了讓滾動條更明顯或為按鈕騰出空間，可以增加水平 padding */
+  /* padding-left: 15px; */
+  /* padding-right: 15px; */
+
+  /* 讓滾動更平滑 (非必要，但體驗較好) */
+  scroll-behavior: smooth;
+  /* 注意：scroll-behavior 對 scrollBy 的 'smooth' 選項沒有影響，但對直接設置 scrollLeft 有影響 */
+
+  /* 隱藏預設的滾動條 (如果按鈕是主要導航方式) - 可選 */
+   scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+}
+/* 隱藏預設滾動條 (WebKit - Chrome, Safari) - 可選 */
+.horizontal-scroll-row::-webkit-scrollbar {
+  display: none;
+}
+
+
+/* 設置卡片容器的基礎寬度 */
+.project-card-wrapper {
+  flex: 0 0 auto; /* 防止卡片縮放 */
+  width: 350px; /* 設定卡片的寬度，你可以根據需要調整 */
+}
+
+/* 確保 card-body 填滿剩餘高度，並允許按鈕區塊推到底部 */
+.card.h-100 .card-body.d-flex {
+  flex-direction: column;
+}
+
+/* 使卡片圖片保持比例 */
+.card-img-top {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+
+
+/* --- 新增：左右按鈕的樣式 --- */
+.horizontal-scroll-container {
+    /* position: relative; 由 Bootstrap class 提供 */
+    /* 如果按鈕要放在 padding 區域，需要設定 overflow: hidden; */
+    /* overflow: hidden;  */ /* 如果按鈕放在容器 padding 內側，則取消註解 */
+}
+
+.scroll-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10; /* 確保按鈕在卡片上方 */
+    border-radius: 50%; /* 圓形按鈕 */
+    width: 40px; /* 按鈕寬度 */
+    height: 40px; /* 按鈕高度 */
+    display: flex; /* 讓內容居中 */
+    align-items: center; /* 垂直居中 */
+    justify-content: center; /* 水平居中 */
+    font-size: 1.2rem; /* 圖標/文字大小 */
+    opacity: 0.8;
+    transition: opacity 0.2s ease-in-out;
+}
+
+.scroll-btn:hover {
+    opacity: 1;
+}
+
+.scroll-btn:disabled {
+    opacity: 0.3; /* 禁用時的透明度 */
+    cursor: not-allowed; /* 禁用時的鼠標樣式 */
+}
+
+.scroll-btn-left {
+    left: -20px; /* 調整按鈕位置，一半在容器外 */
+     /* left: 10px; */ /* 如果希望按鈕在容器內側 */
+}
+
+.scroll-btn-right {
+    right: -20px; /* 調整按鈕位置，一半在容器外 */
+     /* right: 10px; */ /* 如果希望按鈕在容器內側 */
+}
+
+/* 響應式：在中型螢幕以下，如果按鈕是放在容器外側的，可能需要調整位置或隱藏 */
+@media (max-width: 991.98px) { /* 小於 lg 的斷點 */
+  /* 如果按鈕放在外部 (left: -20px)，在小螢幕上可能需要隱藏或調整 */
+  /* .scroll-btn { display: none; } */ /* 或者使用 Bootstrap 的 d-lg-none */
+
+  /* 如果按鈕放在內部 (left: 10px)，則通常不需要特別調整 */
+}
     </style>
  <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-HHR2F6B01J"></script>
@@ -396,7 +492,6 @@
         </div>
     </section>
 
-    <!-- 專案作品 -->
     <section id="projects" class="section">
         <div class="container">
             <div class="row">
@@ -405,68 +500,76 @@
                     <hr class="w-25 mx-auto">
                 </div>
             </div>
-            <div class="row">
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card border-0 shadow h-100">
-                        <a href="https://iexplorer.nmns.edu.tw/mission/" target="_blank"><img src="./img/web3.png" class="card-img-top" alt="電商平台專案"></a>
-                        <div class="card-body">
-                            <h5 class="card-title">國立自然科學博物館解謎探索任務平台</h5>
-                            <p class="text-muted">2023年-2025年</p>
-                            <p class="card-text">為博物館建立Web-base線上解謎任務平台，提供後台建立任務機制與前台任務探索機制，已運用在館內常設展與特展，並獲得客戶好評！</p>
-                            <div class="mt-3">
-                            <a href="https://iexplorer.nmns.edu.tw/mission/" target="_blank"><span class="badge bg-success me-1">開啟網頁</span></a>
+            <div class="horizontal-scroll-container position-relative">
+                <button id="scrollLeftBtn" class="btn btn-primary scroll-btn scroll-btn-left d-none d-lg-block" aria-label="上一個">
+                    &lt; </button>
+                <button id="scrollRightBtn" class="btn btn-primary scroll-btn scroll-btn-right d-none d-lg-block" aria-label="下一個">
+                    &gt; </button>
+                    <div id="projectCarousel" class="row flex-nowrap overflow-auto pb-3 horizontal-scroll-row">
+                <div class="project-card-wrapper me-3"> <div class="card border-0 shadow h-100">
+                        <a href="https://iexplorer.nmns.edu.tw/mission/" target="_blank"><img src="./img/web3.png" class="card-img-top" alt="國立自然科學博物館解謎探索任務平台"></a>
+                        <div class="card-body d-flex flex-column"> <div> <h5 class="card-title">國立自然科學博物館解謎探索任務平台</h5>
+                                <p class="text-muted">2023年-2025年</p>
+                                <p class="card-text">為博物館建立Web-base線上解謎任務平台，提供後台建立任務機制與前台任務探索機制，已運用在館內常設展與特展，並獲得客戶好評！</p>
+                            </div>
+                            <div class="mt-auto pt-3"> <a href="https://iexplorer.nmns.edu.tw/mission/" target="_blank"><span class="badge bg-success me-1">開啟網頁</span></a>
                                 <span class="badge bg-primary me-1">提案企劃,專案管理</span>
                                 <span class="badge bg-primary me-1">需求訪談</span>
                                 <span class="badge bg-primary me-1">前端操作流程規劃</span>
-                                <span class="badge bg-primary me-1">與內部設計和前端後程式溝通製作</span>
+                                <span class="badge bg-primary me-1">與內部設計和前後端程式溝通製作</span>
                                 <span class="badge bg-primary me-1">協助系統測試上線</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="project-card-wrapper me-3">
                     <div class="card border-0 shadow h-100">
-                        <a href="https://museum.cbc.gov.tw/web/zh-tw" target="_blank"><img src="./img/web2.png" class="card-img-top" alt="政府機關網站重構"></a>
-                        <div class="card-body">
-                            <h5 class="card-title">中央銀行券幣數位博物館</h5>
-                            <p class="text-muted">2018年-2025年</p>
-                            <p class="card-text">為央行重新規劃與開發券幣介紹，典藏寶庫，虛擬展覽館的響應式網站，提升使用體驗與資訊可及性。</p>
-                            <div class="mt-3">
+                        <a href="https://museum.cbc.gov.tw/web/zh-tw" target="_blank"><img src="./img/web2.png" class="card-img-top" alt="中央銀行券幣數位博物館"></a>
+                        <div class="card-body d-flex flex-column">
+                            <div>
+                                <h5 class="card-title">中央銀行券幣數位博物館</h5>
+                                <p class="text-muted">2018年-2025年</p>
+                                <p class="card-text">為央行重新規劃與開發券幣介紹，典藏寶庫，虛擬展覽館的響應式網站，提升使用體驗與資訊可及性。</p>
+                            </div>
+                            <div class="mt-auto pt-3">
                                 <a href="https://museum.cbc.gov.tw/web/zh-tw" target="_blank"><span class="badge bg-success me-1">開啟網頁</span></a>
                                 <span class="badge bg-primary me-1">提案,需求訪談,專案管理</span>
                                 <span class="badge bg-primary me-1">網站架構與流程分析規劃</span>
-                                <span class="badge bg-primary me-1">與內部設計和前端後程式溝通製作</span>
+                                <span class="badge bg-primary me-1">與內部設計和前後端程式溝通製作</span>
                                 <span class="badge bg-primary me-1">協助系統測試上線</span>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="col-lg-4 col-md-6 mb-4">
+                <div class="project-card-wrapper me-3">
                     <div class="card border-0 shadow h-100">
-                        <a href="https://twimaginary.npm.gov.tw/web/tw/navigation" target="_blank"><img src="./img/web1.png" class="card-img-top" alt="企業內部管理系統"></a>
-                        <div class="card-body">
-                            <h5 class="card-title">故宮5G台灣意象線上展</h5>
-                            <p class="text-muted">2022年-2023年</p>
-                            <p class="card-text">因應疫情期間為故宮研發線上web3D虛擬展覽，與團隊從研發開始研究相關技術方案，並如期完成客戶需求，建構豐富趣味的線上虛擬展。</p>
-                            <div class="mt-3">
+                        <a href="https://twimaginary.npm.gov.tw/web/tw/navigation" target="_blank"><img src="./img/web1.png" class="card-img-top" alt="故宮5G台灣意象線上展"></a>
+                        <div class="card-body d-flex flex-column">
+                            <div>
+                                <h5 class="card-title">故宮5G台灣意象線上展</h5>
+                                <p class="text-muted">2022年-2023年</p>
+                                <p class="card-text">因應疫情期間為故宮研發線上web3D虛擬展覽，與團隊從研發開始研究相關技術方案，並如期完成客戶需求，建構豐富有趣的線上虛擬展。</p>
+                            </div>
+                             <div class="mt-auto pt-3">
                                 <a href="https://twimaginary.npm.gov.tw/web/tw/navigation" target="_blank"><span class="badge bg-success me-1">開啟網頁</span></a>
                                 <span class="badge bg-primary me-1">專案管理,需求訪談</span>
-                                <span class="badge bg-primary me-1">與內部設計和前端後程式溝通製作技術方案</span>
+                                <span class="badge bg-primary me-1">與內部設計和前後端程式溝通製作技術方案</span>
                                 <span class="badge bg-primary me-1">協助系統測試上線</span>
                             </div>
                         </div>
                     </div>
-
                 </div>
-                <div class="col-lg-4 col-md-6 mb-4">
-                    <div class="card border-0 shadow h-100">
-                        <a href="https://www.youtube.com/watch?v=fiX3sB1Uf3w&feature=youtu.be" target="_blank"><img src="./img/web4.jpg" class="card-img-top" alt="企業內部管理系統"></a>
-                        <div class="card-body">
-                            <h5 class="card-title">芸芸眾生 AI智慧辨識展示多媒體系統</h5>
-                            <p class="text-muted">2023年-2024年</p>
-                            <a href="https://design.museaward.com/winner-info.php?id=17119" target="_blank"><p class="text-primary">榮獲2023法國Muse Design Award 金獎</p></a>
-                            <p class="card-text">提供不同年齡層觀眾能更了解展示內容，國立自然科學博物館以創新策略，規劃了AI智慧辨識展示多媒體系統，在展區內佈署15部多媒體互動機台，透過 AI 人臉辨識技術能快速分析觀眾年齡及情緒反應，主動提供適齡化的展示內容給觀眾，並運用智慧導流技術確認展場內機台使用狀況，推薦觀眾到最佳參觀體驗位置，鼓勵觀眾進行深度參觀學習，同時也結合任務探積分獎勵機制，讓參觀探索過程更加有趣。</p>
-                            <div class="mt-3">
+                <div class="project-card-wrapper me-3">
+                     <div class="card border-0 shadow h-100">
+                        <a href="https://www.youtube.com/watch?v=fiX3sB1Uf3w&feature=youtu.be" target="_blank"><img src="./img/web4.jpg" class="card-img-top" alt="芸芸眾生 AI智慧辨識展示多媒體系統"></a>
+                        <div class="card-body d-flex flex-column">
+                            <div>
+                                <h5 class="card-title">芸芸眾生 AI智慧辨識展示多媒體系統</h5>
+                                <p class="text-muted">2023年-2024年</p>
+                                <a href="https://design.museaward.com/winner-info.php?id=17119" target="_blank"><p class="text-primary">榮獲2023法國Muse Design Award 金獎</p></a>
+                                <p class="card-text">提供不同年齡層觀眾能更瞭解展示內容，國立自然科學博物館以創新策略，規劃了AI智慧辨識展示多媒體系統，在展區內佈署多媒體互動機台，透過 AI 人臉辨識技術能快速分析觀眾年齡，主動提供適齡化的展示內容給觀眾，推薦觀眾到最佳參觀體驗位置，鼓勵觀眾進行深度參觀學習></p>
+                            </div>
+                            <div class="mt-auto pt-3">
                                 <a href="https://www.youtube.com/watch?v=fiX3sB1Uf3w&feature=youtu.be" target="_blank"><span class="badge bg-success me-1">互動展示介紹</span></a>
                                 <a href="https://mymuse3.nmns.edu.tw/nmnsArt/tw/Savannah/general/" target="_blank"><span class="badge bg-success me-1">開啟網頁展示</span></a>
                                 <span class="badge bg-primary me-1">提案企劃,需求訪談</span>
@@ -478,45 +581,48 @@
                             </div>
                         </div>
                     </div>
-            </div>
-            <div class="col-lg-4 col-md-6 mb-4">
-                <div class="card border-0 shadow h-100">
-                    <a href="https://exhibition.drnh.gov.tw/front/tw/lobby" target="_blank"><img src="./img/web5.jpg" class="card-img-top" alt="企業內部管理系統"></a>
-                    <div class="card-body">
-                        <h5 class="card-title">國史館 時遞.光域 線上web3D虛擬展網站</h5>
-                        <p class="text-muted">2023年-2025年</p>
-                        <p class="card-text">運用Web3D技術，將國史館常設展數位化為線上3D虛擬展覽，讓觀眾宛如親臨現場般沉浸式參觀展覽內容。</p>
-                        <div class="mt-3">
-                            <a href="https://exhibition.drnh.gov.tw/front/tw/lobby" target="_blank"><span class="badge bg-success me-1">開啟網頁</span></a>
-                            <span class="badge bg-primary me-1">提案企劃,需求訪談</span>
-                            <span class="badge bg-primary me-1">專案管理,內容發想</span>
-                            <span class="badge bg-primary me-1">介面操作流程規劃</span>
-                            <span class="badge bg-primary me-1">與內部設計和前端程式溝通</span>
-                            <span class="badge bg-primary me-1">協助系統測試上線</span>
+                </div>
+                <div class="project-card-wrapper me-3">
+                    <div class="card border-0 shadow h-100">
+                        <a href="https://exhibition.drnh.gov.tw/front/tw/lobby" target="_blank"><img src="./img/web5.jpg" class="card-img-top" alt="國史館 時‧光域 線上web3D虛擬展網站"></a>
+                        <div class="card-body d-flex flex-column">
+                            <div>
+                                <h5 class="card-title">國史館 時‧光域 線上web3D虛擬展網站</h5>
+                                <p class="text-muted">2023年-2025年</p>
+                                <p class="card-text">運用Web3D技術，將國史館常設展數位化為線上3D虛擬展覽，讓觀眾宛如親臨現場般沉浸式參觀展覽內容。</p>
+                            </div>
+                            <div class="mt-auto pt-3">
+                                <a href="https://exhibition.drnh.gov.tw/front/tw/lobby" target="_blank"><span class="badge bg-success me-1">開啟網頁</span></a>
+                                <span class="badge bg-primary me-1">提案企劃,需求訪談</span>
+                                <span class="badge bg-primary me-1">專案管理,內容發想</span>
+                                <span class="badge bg-primary me-1">介面操作流程規劃</span>
+                                <span class="badge bg-primary me-1">與內部設計和前端程式溝通</span>
+                                <span class="badge bg-primary me-1">協助系統測試上線</span>
+                            </div>
                         </div>
                     </div>
                 </div>
-        </div>
-        <div class="col-lg-4 col-md-6 mb-4">
-            <div class="card border-0 shadow h-100">
-                <a href="https://nmns.xrt.com.tw/2024_nmns_xr/nmnsAI/index.html" target="_blank"><img src="./img/web6.jpg" class="card-img-top" alt="企業內部管理系統"></a>
-                <div class="card-body">
-                    <h5 class="card-title">繪製您夢想中的科博館</h5>
-                    <p class="text-muted">2024年</p>
-                    <p class="card-text">嘗試串接Openai API 製作一個讓觀眾透過回答問題，產生關鍵字，讓Dalle3創作出想像中的圖像！</p>
-                    <div class="mt-3">
-                        <a href="https://nmns.xrt.com.tw/2024_nmns_xr/nmnsAI/index.html" target="_blank"><span class="badge bg-success me-1">開啟網頁</span></a>
-                        <span class="badge bg-primary me-1">提案發想規劃,需求訪談</span>
-                        <span class="badge bg-primary me-1">專案管理,內容發想</span>
-                        <span class="badge bg-primary me-1">介面操作流程規劃</span>
-                        <span class="badge bg-primary me-1">與內部設計和前端程式溝通</span>
-                        <span class="badge bg-primary me-1">協助系統測試上線</span>
+                 <div class="project-card-wrapper me-3">
+                    <div class="card border-0 shadow h-100">
+                        <a href="https://nmns.xrt.com.tw/2024_nmns_xr/nmnsAI/index.html" target="_blank"><img src="./img/web6.jpg" class="card-img-top" alt="編織您夢想中的科博館"></a>
+                        <div class="card-body d-flex flex-column">
+                            <div>
+                                 <h5 class="card-title">編織您夢想中的科博館</h5>
+                                 <p class="text-muted">2024年</p>
+                                 <p class="card-text">嘗試串接Openai API 製作一個讓觀眾透過回答問題，產生關鍵字，讓Dalle3創作出想像中的圖像！</p>
+                            </div>
+                             <div class="mt-auto pt-3">
+                                 <a href="https://nmns.xrt.com.tw/2024_nmns_xr/nmnsAI/index.html" target="_blank"><span class="badge bg-success me-1">開啟網頁</span></a>
+                                 <span class="badge bg-primary me-1">提案發想規劃,需求訪談</span>
+                                 <span class="badge bg-primary me-1">專案管理,內容發想</span>
+                                 <span class="badge bg-primary me-1">介面操作流程規劃</span>
+                                 <span class="badge bg-primary me-1">與內部設計和前端程式溝通</span>
+                                 <span class="badge bg-primary me-1">協助系統測試上線</span>
+                             </div>
+                        </div>
                     </div>
                 </div>
-            </div>
-    </div>
-        </div>
-    </section>
+                </div> </div> </div></section>
 
     <!-- 聯絡資訊 -->
     <section id="contact" class="section bg-light">
@@ -586,6 +692,73 @@
         var scrollSpy = new bootstrap.ScrollSpy(document.body, {
             target: '#navbar'
         });
+    </script>
+    <script>
+document.addEventListener('DOMContentLoaded', () => {
+    const carousel = document.getElementById('projectCarousel');
+    const scrollLeftBtn = document.getElementById('scrollLeftBtn');
+    const scrollRightBtn = document.getElementById('scrollRightBtn');
+
+    if (!carousel || !scrollLeftBtn || !scrollRightBtn) {
+        // 如果缺少任何元素，就不執行後續操作
+        console.warn('Horizontal scroll elements not found.');
+        return;
+    }
+
+    // --- 配置 ---
+    const scrollAmount = carousel.clientWidth * 0.8; // 每次滾動容器可見寬度的 80%
+    const scrollEndThreshold = 5; // 滾動到底部的容錯像素值
+
+    // --- 更新按鈕狀態的函數 ---
+    const updateButtonStates = () => {
+        const currentScroll = carousel.scrollLeft;
+        const maxScroll = carousel.scrollWidth - carousel.clientWidth;
+
+        // 檢查是否在最左邊
+        scrollLeftBtn.disabled = currentScroll <= scrollEndThreshold;
+
+        // 檢查是否在最右邊
+        scrollRightBtn.disabled = currentScroll >= maxScroll - scrollEndThreshold;
+
+        // console.log(`Scroll: ${currentScroll}, Max: ${maxScroll}, Width: ${carousel.clientWidth}, TotalWidth: ${carousel.scrollWidth}`);
+    };
+
+    // --- 事件監聽器 ---
+    scrollLeftBtn.addEventListener('click', () => {
+        carousel.scrollBy({
+            left: -scrollAmount,
+            behavior: 'smooth'
+        });
+        // 平滑滾動需要時間，延遲一點再更新狀態
+        setTimeout(updateButtonStates, 400); // 400ms 是一個估計值
+    });
+
+    scrollRightBtn.addEventListener('click', () => {
+        carousel.scrollBy({
+            left: scrollAmount,
+            behavior: 'smooth'
+        });
+        // 平滑滾動需要時間，延遲一點再更新狀態
+        setTimeout(updateButtonStates, 400);
+    });
+
+    // 當使用者手動滾動時，也更新按鈕狀態
+    // 使用 debounce 或 throttle 可以優化性能，但對於這個場景可能不是絕對必要
+    let scrollTimeout;
+    carousel.addEventListener('scroll', () => {
+        clearTimeout(scrollTimeout);
+        scrollTimeout = setTimeout(updateButtonStates, 100); // 稍微延遲，避免滾動中頻繁更新
+    });
+
+    // 視窗大小改變時，重新計算並更新按鈕狀態
+    window.addEventListener('resize', updateButtonStates);
+
+    // --- 初始化按鈕狀態 ---
+    // 初始載入時，可能需要一點延遲確保寬度計算正確
+    setTimeout(updateButtonStates, 100);
+
+});
+
     </script>
 </body>
 </html>
